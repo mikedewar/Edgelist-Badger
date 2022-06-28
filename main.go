@@ -29,7 +29,7 @@ func main() {
 
 	defer db.Close()
 
-	accounts := make(map[int64]map[int64]interface{})
+	nodes := make(map[int64]map[int64]interface{})
 
 	stream := db.NewStream()
 
@@ -43,12 +43,12 @@ func main() {
 
 			var to map[int64]interface{}
 			var ok bool
-			to, ok = accounts[e.From]
+			to, ok = nodes[e.From]
 			if !ok {
 				to = make(map[int64]interface{})
 			}
 			to[e.To] = nil
-			accounts[e.From] = to
+			nodes[e.From] = to
 		}
 		return nil
 	}
@@ -56,11 +56,11 @@ func main() {
 	if err := stream.Orchestrate(context.Background()); err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Num accounts:", len(accounts))
+	log.Println("Num nodes:", len(nodes))
 
 	degreeDistribution := make(map[int]int)
 
-	for _, tos := range accounts {
+	for _, tos := range nodes {
 		degree := len(tos)
 		d := degreeDistribution[degree]
 		d += 1
